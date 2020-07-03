@@ -3,6 +3,7 @@ import { SET_CURRENT_USER, SET_ERROR } from "../actions/actionTypes";
 const initialState = {
   user: null,
   errors: null,
+  type: null,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -13,6 +14,8 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, errors: payload };
     case "CLEAR_ERRORS":
       return { ...state, errors: null };
+    case "SET_USER_TYPE":
+      return { ...state, type: payload };
     default:
       return state;
   }

@@ -2,8 +2,36 @@ import React, { Component } from "react";
 import LoginForm from "./LoginForm";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
-
+import { Radio } from "antd";
 class index extends Component {
+  state = {
+    userType: "customer",
+  };
+
+  switchKeyError = (key) => {
+    let temp = key;
+    const { userType } = this.state;
+    if (userType == "customer") {
+      temp = temp
+        .replace("username", "Civil ID")
+        .replace("password", "Password")
+        .replace("non_field_errors", "Error")
+        .replace("email", "Civil ID");
+    }
+    return temp;
+  };
+
+  switchValueError = (key) => {
+    let temp = key;
+    if (Array.isArray(temp)) {
+      temp = temp[0];
+    }
+    const { userType } = this.state;
+    if (userType == "customer" && temp) {
+      temp = temp.replace("email", "civil ID").replace("username", "civil ID");
+    }
+    return temp;
+  };
   displayError = () => {
     const { auth } = this.props;
     if (auth.errors) {
@@ -11,7 +39,7 @@ class index extends Component {
         <ul className="w-50 mx-auto">
           {Object.entries(auth.errors).map((el) => (
             <li style={{ color: "red" }}>
-              {el[0]}: {el[1]}
+              {this.switchKeyError(el[0])}: {this.switchValueError(el[1])}
             </li>
           ))}
         </ul>
@@ -20,21 +48,54 @@ class index extends Component {
   };
   render() {
     const { auth } = this.props;
-    if (auth.user && !auth.errors) {
+    const { userType } = this.state;
+    console.log(window.location.pathname);
+    if (
+      auth.user &&
+      !auth.errors &&
+      (!window.location.pathname.includes("moci") || auth.type == "moci")
+    ) {
       return <Redirect to="/" />;
     }
     return (
-      <div>
+      <div className="text-center">
         <h1 className="my-5" style={{ fontSize: "80px" }}>
-          Welcome
+          Welcome to Tamween
         </h1>
         {auth.errors && (
           <h6 className="mb-3" style={{ color: "red" }}>
             {this.displayError()}
           </h6>
         )}
+        <div
+          style={{
+            textAlign: "center",
+          }}
+          className="mb-4"
+        >
+          <p>Login as</p>
+          <Radio.Group
+            defaultValue="customer"
+            buttonStyle="solid"
+            className="mb-3"
+            value={userType}
+            onChange={(e) => {
+              this.setState({ userType: e.target.value });
+            }}
+          >
+            <Radio.Button value="customer" className="radio-hover">
+              Customer
+            </Radio.Button>
+            <Radio.Button value="branch" className="radio-hover">
+              Branch
+            </Radio.Button>
+            <Radio.Button value="admin" className="radio-hover">
+              Admin
+            </Radio.Button>
+          </Radio.Group>
+        </div>
         <div className="w-50 mx-auto">
-          <LoginForm />
+          <LoginForm userType={userType} />
         </div>
       </div>
     );

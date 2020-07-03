@@ -1,17 +1,19 @@
 import React, { Component } from "react";
 import "./App.css";
 import { Switch, Route, Redirect } from "react-router-dom";
-import Component1 from "./components/Component1";
+import AdminPage from "./components/AdminPage";
 import LoginPage from "./components/LoginPage";
 import { connect } from "react-redux";
 import { Button } from "antd";
 import { logout } from "./store/actions/auth.js";
+import Header from "./components/Layout/Header";
 class App extends Component {
   render() {
     const { user } = this.props;
+    const userType = localStorage.getItem("type");
     return (
       <div className="App">
-        {user && <Button onClick={() => this.props.logout()}>Logout</Button>}
+        {user && <Header />}
 
         {!user ? (
           <Switch>
@@ -20,8 +22,12 @@ class App extends Component {
           </Switch>
         ) : (
           <Switch>
-            <Route path="/index" component={Component1} />
-            <Redirect from="/" to="/index" />
+            <Route path="/admin" component={AdminPage} />
+            <Route path="/consumer" component={null} />
+            <Redirect
+              from="/"
+              to={userType == "admin" ? "/admin" : "/consumer"}
+            />
           </Switch>
         )}
       </div>

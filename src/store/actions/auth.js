@@ -6,9 +6,12 @@ import axios from "axios";
 export const login = (userData) => {
   return async (dispatch) => {
     try {
+      dispatch(setCurrentUser());
+
       const res = await instance.post("/login/", userData);
 
       const user = res.data;
+      localStorage.setItem("type", user.type);
       dispatch(setCurrentUser(user.access));
       dispatch({ type: "CLEAR_ERRORS" });
     } catch (err) {
@@ -48,6 +51,7 @@ const setCurrentUser = (token) => {
       });
     } else {
       localStorage.removeItem("token");
+      localStorage.removeItem("type");
       delete instance.defaults.headers.common.Authorization;
       delete axios.defaults.headers.common.Authorization;
 

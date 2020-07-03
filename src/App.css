@@ -1,7 +1,3 @@
-.App {
-  text-align: center;
-}
-
 html,
 body {
   font-family: "Quicksand", "Cairo", sans-serif !important;
@@ -17,6 +13,20 @@ body {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 4px 11px;
+}
+[data-theme="dark"] .editable-row:hover .editable-cell-value-wrap {
+  border: 1px solid #434343;
+}
+
+.anticon {
+  position: relative;
+  top: -3px;
 }
 
 .App-header {
