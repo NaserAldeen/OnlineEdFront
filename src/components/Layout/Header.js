@@ -22,17 +22,22 @@ class LayoutHeader extends Component {
           }}
         >
           {this.props.user && (
-            <Button
-              type="link"
-              style={{ color: "white" }}
-              onClick={() => {
-                this.props.logout();
-                window.location.reload();
-              }}
-              title="Logout"
-            >
-              <LogoutOutlined style={{ fontSize: 22 }} />
-            </Button>
+            <>
+              <span style={{ color: "white" }}>
+                Logged in as {localStorage.getItem("username")}
+              </span>
+              <Button
+                type="link"
+                style={{ color: "white" }}
+                onClick={() => {
+                  this.props.logout();
+                  window.location.reload();
+                }}
+                title="Logout"
+              >
+                <LogoutOutlined style={{ fontSize: 22 }} />
+              </Button>
+            </>
           )}
         </div>
       </Header>

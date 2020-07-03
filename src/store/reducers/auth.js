@@ -4,6 +4,8 @@ const initialState = {
   user: null,
   errors: null,
   type: null,
+
+  username: null,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -16,6 +18,8 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, errors: null };
     case "SET_USER_TYPE":
       return { ...state, type: payload };
+    case "SET_USERNAME":
+      return { ...state, username: payload };
     default:
       return state;
   }

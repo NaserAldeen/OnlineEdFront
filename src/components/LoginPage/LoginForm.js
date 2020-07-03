@@ -15,9 +15,24 @@ class LoginForm extends React.Component {
     phone: "",
     full_name: "",
     address: "",
+
+    //Branch
+    location: "",
+    working_hours: "",
+    address: "",
+    description: "",
   };
   handleSubmit = () => {
-    const { username, password, phone, full_name, address } = this.state;
+    const {
+      username,
+      password,
+      phone,
+      full_name,
+      address,
+      location,
+      working_hours,
+      description,
+    } = this.state;
     const { userType } = this.props;
     if (this.state.type == "login" || this.props.userType == "admin") {
       this.props.login({ username, password, type: this.props.userType });
@@ -27,6 +42,39 @@ class LoginForm extends React.Component {
         password,
         type: this.props.userType,
       };
+
+      if (userType == "branch") {
+        let errors = {};
+        if (!username) {
+          errors["Email"] = "This field may not be empty";
+        }
+        if (!location) {
+          errors["Location"] = "This field may not be empty";
+        }
+        if (!working_hours) {
+          errors["Working hours"] = "This field may not be empty";
+        }
+        if (!address) {
+          errors["Address"] = "This field may not be empty";
+        }
+        if (!password) {
+          errors["Password"] = "This field may not be empty";
+        }
+
+        if (Object.keys(errors).length) {
+          this.props.setError(errors);
+          return;
+        }
+        signupData = {
+          username,
+          password,
+          location,
+          working_hours,
+          address,
+          description,
+          type: this.props.userType,
+        };
+      }
 
       if (userType == "customer") {
         let errors = {};
@@ -80,6 +128,22 @@ class LoginForm extends React.Component {
     return (
       <div>
         <Row gutter={[24, 24]} style={{ alignItems: "center" }}>
+          {type == "login" && userType == "worker" && (
+            <>
+              <Col span={8} className="text-left">
+                Username *
+              </Col>
+              <Col span={16}>
+                <Input
+                  size="large"
+                  placeholder="Username"
+                  onChange={this.onChangeField}
+                  name="username"
+                />
+              </Col>
+            </>
+          )}
+
           {type == "signup" && userType == "customer" && (
             <>
               <Col span={8} className="text-left">
@@ -131,7 +195,7 @@ class LoginForm extends React.Component {
               </Col>
             </>
           )}
-          {userType == "customer" && type == "login" && (
+          {type == "login" && userType == "customer" && (
             <>
               <Col span={8} className="text-left">
                 Civil ID *
@@ -146,7 +210,84 @@ class LoginForm extends React.Component {
               </Col>
             </>
           )}
+          {type == "signup" && userType == "branch" && (
+            <>
+              <Col span={8} className="text-left">
+                Email *
+              </Col>
+              <Col span={16}>
+                <Input
+                  size="large"
+                  placeholder="Email"
+                  onChange={this.onChangeField}
+                  name="username"
+                />
+              </Col>
 
+              <Col span={8} className="text-left">
+                Location *
+              </Col>
+              <Col span={16}>
+                <Input
+                  size="large"
+                  placeholder="Location"
+                  onChange={this.onChangeField}
+                  name="location"
+                />
+              </Col>
+
+              <Col span={8} className="text-left">
+                Working hours *
+              </Col>
+              <Col span={16}>
+                <Input
+                  size="large"
+                  placeholder="Working hours (seperate intervals with a comma)"
+                  onChange={this.onChangeField}
+                  name="working_hours"
+                />
+              </Col>
+
+              <Col span={8} className="text-left">
+                Address *
+              </Col>
+              <Col span={16}>
+                <Input
+                  size="large"
+                  placeholder="Address"
+                  onChange={this.onChangeField}
+                  name="address"
+                />
+              </Col>
+
+              <Col span={8} className="text-left">
+                Description
+              </Col>
+              <Col span={16}>
+                <Input
+                  size="large"
+                  placeholder="Description"
+                  onChange={this.onChangeField}
+                  name="description"
+                />
+              </Col>
+            </>
+          )}
+          {userType == "branch" && type == "login" && (
+            <>
+              <Col span={8} className="text-left">
+                Email *
+              </Col>
+              <Col span={16}>
+                <Input
+                  size="large"
+                  placeholder="Email"
+                  onChange={this.onChangeField}
+                  name="username"
+                />
+              </Col>
+            </>
+          )}
           {userType == "admin" && (
             <>
               <Col span={8} className="text-left">
@@ -177,7 +318,7 @@ class LoginForm extends React.Component {
 
           {userType == "branch" && <></>}
         </Row>
-        {userType != "admin" && (
+        {userType != "admin" && userType != "worker" && (
           <div className="text-left">
             {type == "signup" ? "Already have an account?" : "New here?"}
             <Button

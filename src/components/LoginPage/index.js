@@ -18,6 +18,16 @@ class index extends Component {
         .replace("non_field_errors", "Error")
         .replace("email", "Civil ID");
     }
+    if (userType == "branch") {
+      temp = temp
+        .replace("username", "email")
+        .replace("username", "email")
+        .replace("non_field_errors", "Error");
+    }
+
+    if (userType == "worker") {
+      temp = temp.replace("non_field_errors", "Error");
+    }
     return temp;
   };
 
@@ -29,6 +39,12 @@ class index extends Component {
     const { userType } = this.state;
     if (userType == "customer" && temp) {
       temp = temp.replace("email", "civil ID").replace("username", "civil ID");
+    }
+    if (userType == "branch") {
+      temp = temp.replace("username", "email").replace("username", "Email");
+    }
+    if (userType == "worker") {
+      temp = temp.replace("email", "username");
     }
     return temp;
   };
@@ -91,6 +107,9 @@ class index extends Component {
             </Radio.Button>
             <Radio.Button value="admin" className="radio-hover">
               Admin
+            </Radio.Button>
+            <Radio.Button value="worker" className="radio-hover">
+              Worker
             </Radio.Button>
           </Radio.Group>
         </div>

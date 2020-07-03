@@ -7,7 +7,24 @@ import { connect } from "react-redux";
 import { Button } from "antd";
 import { logout } from "./store/actions/auth.js";
 import Header from "./components/Layout/Header";
+import BranchPage from "./components/BranchPage";
+import WorkerPage from "./components/WorkerPage";
+import CustomerPage from "./components/CustomerPage";
+import ItemsPage from "./components/CustomerPage/items.js";
+
 class App extends Component {
+  getNextPageAfterLogin = (type) => {
+    switch (type) {
+      case "admin":
+        return "/admin";
+      case "customer":
+        return "/consumer";
+      case "branch":
+        return "/branch";
+      case "worker":
+        return "/worker";
+    }
+  };
   render() {
     const { user } = this.props;
     const userType = localStorage.getItem("type");
@@ -23,11 +40,11 @@ class App extends Component {
         ) : (
           <Switch>
             <Route path="/admin" component={AdminPage} />
-            <Route path="/consumer" component={null} />
-            <Redirect
-              from="/"
-              to={userType == "admin" ? "/admin" : "/consumer"}
-            />
+            <Route path="/consumer" component={CustomerPage} />
+            <Route path="/branch" component={BranchPage} />
+            <Route path="/worker" component={WorkerPage} />
+            <Route path="/items" component={ItemsPage} />
+            <Redirect from="/" to={this.getNextPageAfterLogin(userType)} />
           </Switch>
         )}
       </div>

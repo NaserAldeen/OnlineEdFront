@@ -11,7 +11,9 @@ export const login = (userData) => {
       const res = await instance.post("/login/", userData);
 
       const user = res.data;
+
       localStorage.setItem("type", user.type);
+      localStorage.setItem("username", user.username);
       dispatch(setCurrentUser(user.access));
       dispatch({ type: "CLEAR_ERRORS" });
     } catch (err) {
@@ -26,8 +28,17 @@ export const signup = (userData) => {
     try {
       const res = await instance.post("/signup/", userData);
       const user = res.data;
-      dispatch(setCurrentUser(user.access));
-      dispatch(login(userData));
+      if (userData.type != "worker") {
+        dispatch(setCurrentUser(user.access));
+        dispatch(login(userData));
+      } else {
+        try {
+          const res = await instance.get("/fetch_workers/");
+          dispatch({ type: "SET_WORKERS", payload: res.data.workers });
+        } catch (err) {
+          console.error(err);
+        }
+      }
     } catch (err) {
       if (err.response)
         dispatch({ type: SET_ERROR, payload: err.response.data });
@@ -52,6 +63,7 @@ const setCurrentUser = (token) => {
     } else {
       localStorage.removeItem("token");
       localStorage.removeItem("type");
+      localStorage.removeItem("username");
       delete instance.defaults.headers.common.Authorization;
       delete axios.defaults.headers.common.Authorization;
 
