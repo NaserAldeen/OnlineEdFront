@@ -1,26 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import "./App.css";
+import { Switch, Route, Redirect } from "react-router-dom";
+import Component1 from "./components/Component1";
+import LoginPage from "./components/LoginPage";
+import { connect } from "react-redux";
+import { Button } from "antd";
+import { logout } from "./store/actions/auth.js";
+class App extends Component {
+  render() {
+    const { user } = this.props;
+    return (
+      <div className="App">
+        {user && <Button onClick={() => this.props.logout()}>Logout</Button>}
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+        {!user ? (
+          <Switch>
+            <Route path="/login" component={LoginPage} />
+            <Redirect from="/" to="/login" />
+          </Switch>
+        ) : (
+          <Switch>
+            <Route path="/index" component={Component1} />
+            <Redirect from="/" to="/index" />
+          </Switch>
+        )}
+      </div>
+    );
+  }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    user: state.auth.user,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    //Move this to a navbar if you create one
+    logout: () => dispatch(logout()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

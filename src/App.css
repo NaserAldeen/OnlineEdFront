@@ -2,6 +2,12 @@
   text-align: center;
 }
 
+html,
+body {
+  font-family: "Quicksand", "Cairo", sans-serif !important;
+  font-weight: 600 !important ;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
