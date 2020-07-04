@@ -8,13 +8,18 @@ import {
   InputNumber,
   Spin,
   Table,
+  Select,
   message,
 } from "antd";
 import instance from "../../store/actions/instance.js";
 import { LoadingOutlined, DeleteOutlined } from "@ant-design/icons";
+import OrderModal from "./OrderModal.js";
+import moment from "moment";
+import CustomerHistory from "./CustomerHistory";
 
 const { Search } = Input;
 const { Column } = Table;
+const { Option } = Select;
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 const EditableContext = React.createContext();
@@ -96,7 +101,11 @@ class index extends Component {
     items: [],
     loading: false,
 
-    addModalOpen: false,
+    orderModalOpen: false,
+    selectedOrder: null,
+
+    historyModalOpen: false,
+    selectedCustomer: null,
   };
 
   fetchItems = async () => {
@@ -104,6 +113,13 @@ class index extends Component {
     try {
       const res = await instance.get("/fetch_items/");
       this.props.setItems(res.data.items);
+    } catch (err) {
+      console.error(err);
+    }
+
+    try {
+      const res = await instance.get("/fetch_orders/");
+      this.props.setOrders(res.data.orders);
     } catch (err) {
       console.error(err);
     }
@@ -148,8 +164,34 @@ class index extends Component {
   componentDidMount = () => {
     this.fetchItems();
   };
+
+  changeOrderStatus = async (order, status) => {
+    try {
+      const res = await instance.post("/change_order_status/", {
+        id: order,
+        status: status,
+      });
+      try {
+        const res = await instance.get("/fetch_orders/");
+        this.props.setOrders(res.data.orders);
+      } catch (err) {
+        console.error(err);
+      }
+      message.success("Status changed successfully");
+    } catch (err) {
+      message.error("Couldn't change the status");
+      console.error(err);
+    }
+  };
   render() {
-    const { loading, addItemModal } = this.state;
+    const {
+      loading,
+      addItemModal,
+      orderModalOpen,
+      selectedOrder,
+      selectedCustomer,
+      historyModalOpen,
+    } = this.state;
     const { admin } = this.props;
 
     if (loading) {
@@ -163,6 +205,24 @@ class index extends Component {
     const data = admin.items.map((item) => ({ key: item.id, obj: item }));
     return (
       <div className="px-3 py-3">
+        {selectedOrder && (
+          <OrderModal
+            visible={orderModalOpen}
+            selectedOrder={selectedOrder}
+            onClose={() =>
+              this.setState({ selectedOrder: null, orderModalOpen: false })
+            }
+          />
+        )}
+        {historyModalOpen && (
+          <CustomerHistory
+            visible={historyModalOpen}
+            customer={selectedCustomer}
+            onClose={() =>
+              this.setState({ historyModalOpen: false, selectedCustomer: null })
+            }
+          />
+        )}
         <h4>Inventory</h4>
 
         <Row className="my-4">
@@ -229,6 +289,109 @@ class index extends Component {
             }}
           />
         </Table>
+
+        <h4>Incoming orders</h4>
+        <Table
+          scroll={{ x: 600 }}
+          dataSource={admin.orders.map((order) => ({
+            key: order.id,
+            obj: order,
+          }))}
+          pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "25", "50", "100", "250"],
+          }}
+          components={{
+            body: {
+              row: EditableRow,
+              cell: EditableCell,
+            },
+          }}
+          rowClassName={() => "editable-row"}
+        >
+          <Column
+            title={"Status"}
+            key="status"
+            render={(text, record) => (
+              <Select
+                defaultValue={record.obj.status}
+                onChange={() => {}}
+                style={{ width: 150 }}
+                onChange={(e) => this.changeOrderStatus(record.obj.id, e)}
+              >
+                <Option value="New">Created</Option>
+                <Option value="Cancelled">Cancelled</Option>
+                <Option value="Out for Delivery">Out for Delivery</Option>
+                <Option value="Waiting Pickup">Waiting Pickup</Option>
+                <Option value="Done">Done</Option>
+              </Select>
+            )}
+          />
+          <Column
+            title={"Placed"}
+            key="placed"
+            render={(text, record) => (
+              <div>
+                {moment(record.obj.created, "YYYY-MM-DDTHH:mm").format(
+                  "YYYY-MM-DD HH:mm"
+                )}
+              </div>
+            )}
+          />
+          <Column
+            title={"Expected"}
+            key="expected"
+            render={(text, record) => (
+              <div
+                onClick={() =>
+                  this.setState({
+                    orderModalOpen: true,
+                    selectedOrder: record.obj,
+                  })
+                }
+              >
+                {record.obj.expected}
+              </div>
+            )}
+          />
+
+          <Column
+            title={"Customer"}
+            key="customer"
+            render={(text, record) => (
+              <div>
+                <p className="mb-0">{record.obj.customer.full_name}</p>
+                <p className="mb-0">{record.obj.customer.username}</p>
+                <p className="mb-0">{record.obj.customer.phone}</p>
+                <Button
+                  type="link"
+                  className="p-0"
+                  onClick={() =>
+                    this.setState({
+                      historyModalOpen: true,
+                      selectedCustomer: record.obj.customer.id,
+                    })
+                  }
+                >
+                  History
+                </Button>
+              </div>
+            )}
+          />
+
+          <Column
+            title={"Type"}
+            key="type"
+            render={(text, record) => (
+              <div>
+                {record.obj.is_delivery
+                  ? `Delivery to ${record.obj.address}`
+                  : `Pickup`}
+              </div>
+            )}
+          />
+        </Table>
       </div>
     );
   }
@@ -243,6 +406,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setItems: (items) => dispatch({ type: "SET_ITEMS", payload: items }),
+    setOrders: (orders) => dispatch({ type: "SET_ORDERS", payload: orders }),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(index);

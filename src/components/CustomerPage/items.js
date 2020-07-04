@@ -16,7 +16,8 @@ import {
 import instance from "../../store/actions/instance.js";
 import { LoadingOutlined, DeleteOutlined } from "@ant-design/icons";
 import ProductModal from "./ProductModal.js";
-
+import { Redirect } from "react-router-dom";
+import OrderHistoryModal from "./OrderHistoryModal";
 const { Search } = Input;
 const { Column } = Table;
 const { Option } = Select;
@@ -33,6 +34,8 @@ class index extends Component {
 
     productOpen: false,
     selectedProduct: null,
+
+    historyModalOpen: false,
   };
 
   fetchItems = async () => {
@@ -50,9 +53,17 @@ class index extends Component {
     this.fetchItems();
   };
   render() {
-    const { loading, productOpen, selectedProduct } = this.state;
+    const {
+      loading,
+      productOpen,
+      selectedProduct,
+      historyModalOpen,
+    } = this.state;
     const { admin } = this.props;
 
+    if (!admin.selectedBranch) {
+      return <Redirect to="/consumer" />;
+    }
     if (loading) {
       return (
         <div className="my-5 text-center">
@@ -73,6 +84,20 @@ class index extends Component {
             }
           />
         )}
+        {historyModalOpen && (
+          <OrderHistoryModal
+            visible={historyModalOpen}
+            onClose={() => this.setState({ historyModalOpen: false })}
+          />
+        )}
+        <div className="text-lef">
+          <Button
+            type="primary"
+            onClick={() => this.setState({ historyModalOpen: true })}
+          >
+            Order history
+          </Button>
+        </div>
         <Row className="my-4">
           <Col span={6}>
             <h4>Our products</h4>
@@ -90,15 +115,18 @@ class index extends Component {
             <Col span={6}>
               <Card
                 hoverable
-                onClick={() =>
-                  this.setState({ selectedProduct: item, productOpen: true })
-                }
                 style={{ width: 240 }}
                 cover={
                   <img
                     alt="example"
                     style={{ width: 240, height: 240 }}
                     src={item.image}
+                    onClick={() =>
+                      this.setState({
+                        selectedProduct: item,
+                        productOpen: true,
+                      })
+                    }
                   />
                 }
               >
@@ -118,6 +146,14 @@ class index extends Component {
                         <Tag color="red">Out of stock</Tag>
                       )}
                       <p className="mt-2">Purchase limit: {item.limit} items</p>
+                      <Button
+                        type="primary"
+                        className="w-100"
+                        onClick={() => this.props.addToCart(item)}
+                        disabled={item.inventory == 0}
+                      >
+                        Add to cart
+                      </Button>
                     </>
                   }
                 />
@@ -139,6 +175,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setItems: (items) => dispatch({ type: "SET_ITEMS", payload: items }),
+    addToCart: (item) => dispatch({ type: "ADD_TO_CART", payload: item }),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(index);
