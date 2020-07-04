@@ -7,22 +7,16 @@ import { connect } from "react-redux";
 import { Button } from "antd";
 import { logout } from "./store/actions/auth.js";
 import Header from "./components/Layout/Header";
-import BranchPage from "./components/BranchPage";
-import WorkerPage from "./components/WorkerPage";
-import CustomerPage from "./components/CustomerPage";
-import ItemsPage from "./components/CustomerPage/items.js";
+import StudentPage from "./components/StudentPage";
+import TeacherPage from "./components/TeacherPage";
 
 class App extends Component {
   getNextPageAfterLogin = (type) => {
     switch (type) {
-      case "admin":
-        return "/admin";
-      case "customer":
-        return "/consumer";
-      case "branch":
-        return "/branch";
-      case "worker":
-        return "/worker";
+      case "student":
+        return "/student";
+      case "teacher":
+        return "/teacher";
     }
   };
   render() {
@@ -39,11 +33,8 @@ class App extends Component {
           </Switch>
         ) : (
           <Switch>
-            <Route path="/admin" component={AdminPage} />
-            <Route path="/consumer" component={CustomerPage} />
-            <Route path="/branch" component={BranchPage} />
-            <Route path="/worker" component={WorkerPage} />
-            <Route path="/items" component={ItemsPage} />
+            <Route path="/student" component={StudentPage} />
+            <Route path="/teacher" component={TeacherPage} />
             <Redirect from="/" to={this.getNextPageAfterLogin(userType)} />
           </Switch>
         )}

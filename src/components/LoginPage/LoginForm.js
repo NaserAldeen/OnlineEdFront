@@ -8,109 +8,39 @@ class LoginForm extends React.Component {
   state = {
     type: "login",
 
+    name: "",
     username: "",
     password: "",
 
     //Customer
-    phone: "",
-    full_name: "",
-    address: "",
-
-    //Branch
-    location: "",
-    working_hours: "",
-    address: "",
-    description: "",
   };
   handleSubmit = () => {
-    const {
-      username,
-      password,
-      phone,
-      full_name,
-      address,
-      location,
-      working_hours,
-      description,
-    } = this.state;
-    const { userType } = this.props;
-    if (this.state.type == "login" || this.props.userType == "admin") {
+    const { username, password, name } = this.state;
+    if (this.state.type == "login") {
       this.props.login({ username, password, type: this.props.userType });
     } else {
-      let signupData = {
+      let errors = {};
+      if (!username) {
+        errors["Username"] = "This field may not be empty";
+      }
+      if (!password) {
+        errors["password"] = "This field may not be empty";
+      }
+      if (!name) {
+        errors["Name"] = "This field may not be empty";
+      }
+
+      if (Object.keys(errors).length) {
+        this.props.setError(errors);
+        return;
+      }
+      const signupData = {
         username,
         password,
+        name,
         type: this.props.userType,
       };
 
-      if (userType == "branch") {
-        let errors = {};
-        if (!username) {
-          errors["Email"] = "This field may not be empty";
-        }
-        if (!location) {
-          errors["Location"] = "This field may not be empty";
-        }
-        if (!working_hours) {
-          errors["Working hours"] = "This field may not be empty";
-        }
-        if (!address) {
-          errors["Address"] = "This field may not be empty";
-        }
-        if (!password) {
-          errors["Password"] = "This field may not be empty";
-        }
-
-        if (Object.keys(errors).length) {
-          this.props.setError(errors);
-          return;
-        }
-        signupData = {
-          username,
-          password,
-          location,
-          working_hours,
-          address,
-          description,
-          type: this.props.userType,
-        };
-      }
-
-      if (userType == "customer") {
-        let errors = {};
-        if (!username) {
-          errors["Civil ID"] = "This field may not be empty";
-        } else {
-          if (username.length != 12) {
-            errors["Civil ID"] = "Invalid civil ID";
-          }
-        }
-        if (!password) {
-          errors["Password"] = "This field may not be empty";
-        }
-        if (!phone) {
-          errors["Phone"] = "This field may not be empty";
-        }
-        if (!full_name) {
-          errors["Full name"] = "This field may not be empty";
-        }
-        if (!address) {
-          errors["Address"] = "This field may not be empty";
-        }
-        console.log(errors);
-        if (Object.keys(errors).length) {
-          this.props.setError(errors);
-          return;
-        }
-        signupData = {
-          username,
-          password,
-          phone,
-          full_name,
-          address,
-          type: this.props.userType,
-        };
-      }
       this.props.signup(signupData);
     }
   };
@@ -128,10 +58,10 @@ class LoginForm extends React.Component {
     return (
       <div>
         <Row gutter={[24, 24]} style={{ alignItems: "center" }}>
-          {type == "login" && userType == "worker" && (
+          {type == "login" && (
             <>
               <Col span={8} className="text-left">
-                Username *
+                Email *
               </Col>
               <Col span={16}>
                 <Input
@@ -141,77 +71,35 @@ class LoginForm extends React.Component {
                   name="username"
                 />
               </Col>
-            </>
-          )}
-
-          {type == "signup" && userType == "customer" && (
-            <>
-              <Col span={8} className="text-left">
-                Civil ID *
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Civil ID"
-                  onChange={this.onChangeField}
-                  name="username"
-                />
-              </Col>
 
               <Col span={8} className="text-left">
-                Phone *
+                Password *
               </Col>
               <Col span={16}>
-                <Input
+                <Input.Password
                   size="large"
-                  placeholder="Phone number"
+                  placeholder="Passowrd"
                   onChange={this.onChangeField}
-                  name="phone"
-                />
-              </Col>
-
-              <Col span={8} className="text-left">
-                Full name *
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Full name"
-                  onChange={this.onChangeField}
-                  name="full_name"
-                />
-              </Col>
-
-              <Col span={8} className="text-left">
-                Address *
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Address"
-                  onChange={this.onChangeField}
-                  name="address"
+                  name="password"
                 />
               </Col>
             </>
           )}
-          {type == "login" && userType == "customer" && (
+
+          {type == "signup" && (
             <>
               <Col span={8} className="text-left">
-                Civil ID *
+                Name *
               </Col>
               <Col span={16}>
                 <Input
                   size="large"
-                  placeholder="Civil ID"
+                  placeholder="Name"
                   onChange={this.onChangeField}
-                  name="username"
+                  name="name"
                 />
               </Col>
-            </>
-          )}
-          {type == "signup" && userType == "branch" && (
-            <>
+
               <Col span={8} className="text-left">
                 Email *
               </Col>
@@ -225,98 +113,18 @@ class LoginForm extends React.Component {
               </Col>
 
               <Col span={8} className="text-left">
-                Location *
+                Password *
               </Col>
               <Col span={16}>
-                <Input
+                <Input.Password
                   size="large"
-                  placeholder="Location"
+                  placeholder="Password"
                   onChange={this.onChangeField}
-                  name="location"
-                />
-              </Col>
-
-              <Col span={8} className="text-left">
-                Working hours *
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Working hours (seperate intervals with a comma)"
-                  onChange={this.onChangeField}
-                  name="working_hours"
-                />
-              </Col>
-
-              <Col span={8} className="text-left">
-                Address *
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Address"
-                  onChange={this.onChangeField}
-                  name="address"
-                />
-              </Col>
-
-              <Col span={8} className="text-left">
-                Description
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Description"
-                  onChange={this.onChangeField}
-                  name="description"
+                  name="password"
                 />
               </Col>
             </>
           )}
-          {userType == "branch" && type == "login" && (
-            <>
-              <Col span={8} className="text-left">
-                Email *
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Email"
-                  onChange={this.onChangeField}
-                  name="username"
-                />
-              </Col>
-            </>
-          )}
-          {userType == "admin" && (
-            <>
-              <Col span={8} className="text-left">
-                Username *
-              </Col>
-              <Col span={16}>
-                <Input
-                  size="large"
-                  placeholder="Username"
-                  onChange={this.onChangeField}
-                  name="username"
-                />
-              </Col>
-            </>
-          )}
-          <Col span={8} className="text-left">
-            Password *
-          </Col>
-          <Col span={16}>
-            <Input.Password
-              size="large"
-              placeholder="Password"
-              prefix={<LockOutlined />}
-              onChange={this.onChangeField}
-              name="password"
-            />
-          </Col>
-
-          {userType == "branch" && <></>}
         </Row>
         {userType != "admin" && userType != "worker" && (
           <div className="text-left">

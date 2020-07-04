@@ -5,29 +5,17 @@ import { Redirect } from "react-router-dom";
 import { Radio } from "antd";
 class index extends Component {
   state = {
-    userType: "customer",
+    userType: "student",
   };
 
   switchKeyError = (key) => {
     let temp = key;
     const { userType } = this.state;
-    if (userType == "customer") {
-      temp = temp
-        .replace("username", "Civil ID")
-        .replace("password", "Password")
-        .replace("non_field_errors", "Error")
-        .replace("email", "Civil ID");
-    }
-    if (userType == "branch") {
-      temp = temp
-        .replace("username", "email")
-        .replace("username", "email")
-        .replace("non_field_errors", "Error");
-    }
 
-    if (userType == "worker") {
-      temp = temp.replace("non_field_errors", "Error");
-    }
+    temp = temp
+      .replace("non_field_errors", "Error")
+      .replace("username", "Email");
+
     return temp;
   };
 
@@ -37,15 +25,8 @@ class index extends Component {
       temp = temp[0];
     }
     const { userType } = this.state;
-    if (userType == "customer" && temp) {
-      temp = temp.replace("email", "civil ID").replace("username", "civil ID");
-    }
-    if (userType == "branch") {
-      temp = temp.replace("username", "email").replace("username", "Email");
-    }
-    if (userType == "worker") {
-      temp = temp.replace("email", "username");
-    }
+    temp = temp.replace("username", "email");
+
     return temp;
   };
   displayError = () => {
@@ -65,18 +46,11 @@ class index extends Component {
   render() {
     const { auth } = this.props;
     const { userType } = this.state;
-    console.log(window.location.pathname);
-    if (
-      auth.user &&
-      !auth.errors &&
-      (!window.location.pathname.includes("moci") || auth.type == "moci")
-    ) {
-      return <Redirect to="/" />;
-    }
+
     return (
       <div className="text-center">
         <h1 className="my-5" style={{ fontSize: "80px" }}>
-          Welcome to Tamween
+          Welcome to OnlineEd
         </h1>
         {auth.errors && (
           <h6 className="mb-3" style={{ color: "red" }}>
@@ -91,7 +65,7 @@ class index extends Component {
         >
           <p>Login as</p>
           <Radio.Group
-            defaultValue="customer"
+            defaultValue="student"
             buttonStyle="solid"
             className="mb-3"
             value={userType}
@@ -99,17 +73,11 @@ class index extends Component {
               this.setState({ userType: e.target.value });
             }}
           >
-            <Radio.Button value="customer" className="radio-hover">
-              Customer
+            <Radio.Button value="student" className="radio-hover">
+              Student
             </Radio.Button>
-            <Radio.Button value="branch" className="radio-hover">
-              Branch
-            </Radio.Button>
-            <Radio.Button value="admin" className="radio-hover">
-              Admin
-            </Radio.Button>
-            <Radio.Button value="worker" className="radio-hover">
-              Worker
+            <Radio.Button value="teacher" className="radio-hover">
+              Teacher
             </Radio.Button>
           </Radio.Group>
         </div>

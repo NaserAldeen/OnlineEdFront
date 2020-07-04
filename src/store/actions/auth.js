@@ -28,17 +28,8 @@ export const signup = (userData) => {
     try {
       const res = await instance.post("/signup/", userData);
       const user = res.data;
-      if (userData.type != "worker") {
-        dispatch(setCurrentUser(user.access));
-        dispatch(login(userData));
-      } else {
-        try {
-          const res = await instance.get("/fetch_workers/");
-          dispatch({ type: "SET_WORKERS", payload: res.data.workers });
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      dispatch(setCurrentUser(user.access));
+      dispatch(login(userData));
     } catch (err) {
       if (err.response)
         dispatch({ type: SET_ERROR, payload: err.response.data });
